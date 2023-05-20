@@ -1,0 +1,16 @@
+# Pull Request Slack Bot
+
+##### TODO
+
+- [ ] Create a slackbot that can list all open prs for a repo
+- [ ] Create a slackbot that can list all of your PRs on the channel
+
+## Features
+
+### Slash commands
+
+- `/pr help` - list all emoji meanings and commands;
+- `/pr list <repo>` - list all open prs for a given repo on the channel;
+- `/pr list mine` - list all of your PRs on the channel;
+- `/pr list @user` - list all PRs on the channel from a specific user;
+- `/pr list @userGroup` - list all PRs on the channel from a specific user group;
