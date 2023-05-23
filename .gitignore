@@ -1,0 +1,5 @@
+bin/
+.env
+server.crt
+server.key
+baseURL.json

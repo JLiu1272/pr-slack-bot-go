@@ -14,3 +14,7 @@
 - `/pr list mine` - list all of your PRs on the channel;
 - `/pr list @user` - list all PRs on the channel from a specific user;
 - `/pr list @userGroup` - list all PRs on the channel from a specific user group;
+
+### Resources
+
+- [Slack API Admin Panel](https://api.slack.com/apps/A059EPB12KS)
