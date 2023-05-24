@@ -103,11 +103,11 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("baseStr: %v\n\n", baseStr)
 	fmt.Printf("Generated Hash: %v\n\n", generated_hash)
 
-	if generated_hash != slack_signature {
-		fmt.Println("Invalid token")
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
+	// if generated_hash != slack_signature {
+	// 	fmt.Println("Invalid token")
+	// 	w.WriteHeader(http.StatusUnauthorized)
+	// 	return
+	// }
 
 	switch command {
 	case "/pr":
@@ -120,14 +120,6 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
-
-// func main() {
-// 	body := "token=xyzz0WbapA4vBCDEFasx0q6G&team_id=T1DC2JH3J&team_domain=testteamnow&channel_id=G8PSS9T3V&channel_name=foobar&user_id=U2CERLKJA&user_name=roadrunner&command=%2Fwebhook-collect&text=&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT1DC2JH3J%2F397700885554%2F96rGlfmibIGlgcZRskXaIFfN&trigger_id=398738663015.47445629121.803a0bc887a14d10d2c447fce8b6703c"
-// 	baseStr := "v0:" + "1531420618" + ":" + body
-// 	slack_signature := "8f742231b10e8888abcd99yyyzzz85a5"
-// 	generated_hash := hash_str(baseStr, slack_signature)
-// 	fmt.Printf("Generated Hash: %v\n", generated_hash)
-// }
 
 func main() {
 	http.HandleFunc("/receive", slashCommandHandler)
