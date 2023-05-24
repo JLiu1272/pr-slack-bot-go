@@ -24,26 +24,6 @@ func getENVVar(key string) string {
 	return os.Getenv(key)
 }
 
-func hash_str(message string, secretKey string) string {
-	// Convert the secret key to bytes
-	key := []byte(secretKey)
-
-	// Create an HMAC-SHA256 hasher
-	hasher := hmac.New(sha256.New, key)
-
-	// Write the message to the hasher
-	hasher.Write([]byte(message))
-
-	// Get the final hash
-	hash := hasher.Sum(nil)
-
-	// Convert the hash to a hexadecimal string
-	hashString := hex.EncodeToString(hash)
-
-	fmt.Println("HMAC SHA256 hash:", hashString)
-	return hashString
-}
-
 func formatSlashCommand(command slack.SlashCommand) string {
 	var keys []string
 	values := make(url.Values)
@@ -82,6 +62,21 @@ func formatSlashCommand(command slack.SlashCommand) string {
 
 }
 
+func VerifySlackRequest(r *http.Request, baseStr string, signingSecret string) (bool, error) {
+	signature := r.Header.Get("X-Slack-Signature")
+
+	// Calculate HMAC-SHA256 hash
+	sig := hmac.New(sha256.New, []byte(signingSecret))
+	sig.Write([]byte(baseStr))
+	expectedSignature := hex.EncodeToString(sig.Sum(nil))
+
+	fmt.Printf("Expected Signature: %v\n\n", expectedSignature)
+	fmt.Printf("Slack Signature: %v\n\n", signature)
+
+	// Compare signatures
+	return hmac.Equal([]byte(signature), []byte(expectedSignature)), nil
+}
+
 func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 	s, err := slack.SlashCommandParse(r)
 	if err != nil {
@@ -97,17 +92,19 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 		r.Header.Get("X-Slack-Request-Timestamp"),
 		formatSlashCommand(s),
 	)
-	generated_hash := hash_str(baseStr, getENVVar("OLD_TOKEN"))
 
 	fmt.Printf("X-Slack-Signature: %v\n\n", slack_signature)
 	fmt.Printf("baseStr: %v\n\n", baseStr)
-	fmt.Printf("Generated Hash: %v\n\n", generated_hash)
 
-	// if generated_hash != slack_signature {
-	// 	fmt.Println("Invalid token")
-	// 	w.WriteHeader(http.StatusUnauthorized)
-	// 	return
-	// }
+	isVerified, err := VerifySlackRequest(r, baseStr, getENVVar("SLACK_TOKEN"))
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Println("It can here")
+		return
+	}
+
+	fmt.Printf("slack request is valid:%v", isVerified)
 
 	switch command {
 	case "/pr":
