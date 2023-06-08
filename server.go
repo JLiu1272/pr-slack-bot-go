@@ -118,10 +118,15 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func main() {
-	http.HandleFunc("/receive", slashCommandHandler)
+// func main() {
+// 	http.HandleFunc("/receive", slashCommandHandler)
 
-	// log.Fatal(http.ListenAndServeTLS(":443", "server.crt", "server.key", nil))
-	fmt.Println("Server listening on port 8080...")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+// 	// log.Fatal(http.ListenAndServeTLS(":443", "server.crt", "server.key", nil))
+// 	fmt.Println("Server listening on port 8080...")
+// 	log.Fatal(http.ListenAndServe(":8080", nil))
+// }
+
+func main() {
+	res, _ := listRepos("test")
+	fmt.Printf("res: %v\n", res)
 }

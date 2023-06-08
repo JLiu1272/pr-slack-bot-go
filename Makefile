@@ -9,4 +9,4 @@ build:
 
 start:
 	@echo "Starting server..."
-	@go run server.go
+	@go run *.go 
