@@ -2,12 +2,29 @@ package main
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/machinebox/graphql"
 )
 
-func listRepos(owner string, repoName string) {
+type Repository struct {
+	Repository Issues `json:"repository"`
+}
+
+type Issues struct {
+	Issues Nodes `json:"issues"`
+}
+
+type Nodes struct {
+	Nodes []Node `json:"nodes"`
+}
+
+type Node struct {
+	Title string `json:"title"`
+	Body  string `json:"body"`
+	URL   string `json:"url"`
+}
+
+func listRepos(owner string, repoName string) Repository {
 	graphqlClient := graphql.NewClient("https://api.github.com/graphql")
 	graphqlRequest := graphql.NewRequest(
 		`
@@ -28,9 +45,10 @@ func listRepos(owner string, repoName string) {
 	graphqlRequest.Var("repoName", repoName)
 
 	graphqlRequest.Header.Add("Authorization", "bearer "+getENVVar("GITHUB_TOKEN"))
-	var graphqlResponse interface{}
+	var graphqlResponse Repository
+
 	if err := graphqlClient.Run(context.Background(), graphqlRequest, &graphqlResponse); err != nil {
 		panic(err)
 	}
-	fmt.Println(graphqlResponse)
+	return graphqlResponse
 }
