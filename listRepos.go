@@ -1,17 +1,16 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
+	"context"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"time"
+
+	"github.com/machinebox/graphql"
 )
 
 func listRepos() {
-	jsonData := map[string]string{
-		"query": `
+	graphqlClient := graphql.NewClient("https://api.github.com/graphql")
+	graphqlRequest := graphql.NewRequest(
+		`
 			{
 				repository(owner: "JLiu1272", name: "github-webhook-server") {
 					issues(last: 5) {
@@ -22,27 +21,13 @@ func listRepos() {
 						}
 					}
 				}
-			}`,
+			}
+		`,
+	)
+	graphqlRequest.Header.Add("Authorization", "bearer "+getENVVar("GITHUB_TOKEN"))
+	var graphqlResponse interface{}
+	if err := graphqlClient.Run(context.Background(), graphqlRequest, &graphqlResponse); err != nil {
+		panic(err)
 	}
-	jsonValue, _ := json.Marshal(jsonData)
-	request, err := http.NewRequest("POST", "https://api.github.com/graphql", bytes.NewBuffer(jsonValue))
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	request.Header.Set("Authorization", "bearer "+getENVVar("GITHUB_TOKEN"))
-
-	client := &http.Client{Timeout: time.Second * 10}
-	response, err := client.Do(request)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer response.Body.Close()
-
-	if err != nil {
-		fmt.Printf("The HTTP request failed with error %s\n", err)
-	}
-	data, _ := ioutil.ReadAll(response.Body)
-	fmt.Println(string(data))
+	fmt.Println(graphqlResponse)
 }
