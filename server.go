@@ -127,5 +127,5 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 // }
 
 func main() {
-	listRepos()
+	listRepos("JLiu1272", "github-webhook-server")
 }

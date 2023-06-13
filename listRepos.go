@@ -7,12 +7,12 @@ import (
 	"github.com/machinebox/graphql"
 )
 
-func listRepos() {
+func listRepos(owner string, repoName string) {
 	graphqlClient := graphql.NewClient("https://api.github.com/graphql")
 	graphqlRequest := graphql.NewRequest(
 		`
-			{
-				repository(owner: "JLiu1272", name: "github-webhook-server") {
+			query($owner: String!, $repoName: String!) {
+				repository(owner: $owner, name: $repoName) {
 					issues(last: 5) {
 						nodes {
 							title
@@ -24,6 +24,9 @@ func listRepos() {
 			}
 		`,
 	)
+	graphqlRequest.Var("owner", owner)
+	graphqlRequest.Var("repoName", repoName)
+
 	graphqlRequest.Header.Add("Authorization", "bearer "+getENVVar("GITHUB_TOKEN"))
 	var graphqlResponse interface{}
 	if err := graphqlClient.Run(context.Background(), graphqlRequest, &graphqlResponse); err != nil {
