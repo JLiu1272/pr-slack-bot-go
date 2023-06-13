@@ -127,6 +127,5 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 // }
 
 func main() {
-	res, _ := listRepos("test")
-	fmt.Printf("res: %v\n", res)
+	listRepos()
 }

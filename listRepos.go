@@ -2,59 +2,47 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
-	"log"
+	"io/ioutil"
 	"net/http"
+	"time"
 )
 
-type GraphQLQuery struct {
-	Query string `json:"query"`
-}
-
-func sendGraphQLQuery(query string) {
-	url := "https://api.github.com/graphql"
-	authToken := "YOUR_GITHUB_AUTH_TOKEN"
-
-	// Create a context with an HTTP client and set headers
-	ctx := context.Background()
-	client := &http.Client{}
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(query)))
-	req.Header.Set("Authorization", "Bearer "+authToken)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Accept", "application/json")
-
-	// Make the HTTP request
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal(err)
+func listRepos() {
+	jsonData := map[string]string{
+		"query": `
+			{
+				repository(owner: "JLiu1272", name: "github-webhook-server") {
+					issues(last: 5) {
+						nodes {
+							title
+							body
+							url
+						}
+					}
+				}
+			}`,
 	}
-	defer resp.Body.Close()
-
-	// Parse the response
-	var result map[string]interface{}
-	err = json.NewDecoder(resp.Body).Decode(&result)
+	jsonValue, _ := json.Marshal(jsonData)
+	request, err := http.NewRequest("POST", "https://api.github.com/graphql", bytes.NewBuffer(jsonValue))
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		return
 	}
+	request.Header.Set("Authorization", "bearer "+getENVVar("GITHUB_TOKEN"))
 
-	// Process the response
-	fmt.Println(result)
-}
+	client := &http.Client{Timeout: time.Second * 10}
+	response, err := client.Do(request)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer response.Body.Close()
 
-func listRepos(repoName string) (string, error) {
-	query := `
-    {
-        repository(owner: "OWNER_NAME", name: "REPO_NAME") {
-            issues(last: 5) {
-                nodes {
-                    title
-                    body
-                    url
-                }
-            }
-        }
-    }`
-	sendGraphQLQuery(query)
+	if err != nil {
+		fmt.Printf("The HTTP request failed with error %s\n", err)
+	}
+	data, _ := ioutil.ReadAll(response.Body)
+	fmt.Println(string(data))
 }
