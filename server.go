@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 	"github.com/nlopes/slack"
@@ -108,8 +109,19 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch command {
 	case "/pr":
-		response := fmt.Sprintf("You asked for the weather for %v", params.Text)
-		w.Write([]byte(response))
+		actions := strings.Fields(params.Text)
+		fmt.Println(actions[0])
+		fmt.Println(actions[1])
+
+		if actions[0] == "list" {
+			repoName := strings.Split(actions[1], ":")
+			repository := listRepos("JLiu1272", repoName[1])
+			response := fmt.Sprintf("%#v", repository)
+			w.Write([]byte(response))
+		}
+
+		// response := fmt.Sprintf("Do you want to create a PR for %v to %v?", actions[0], actions[1])
+		// w.Write([]byte(response))
 
 	default:
 		w.WriteHeader(http.StatusInternalServerError)
@@ -118,20 +130,20 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// func main() {
-// 	http.HandleFunc("/receive", slashCommandHandler)
-
-// 	// log.Fatal(http.ListenAndServeTLS(":443", "server.crt", "server.key", nil))
-// 	fmt.Println("Server listening on port 8080...")
-// 	log.Fatal(http.ListenAndServe(":8080", nil))
-// }
-
 func main() {
-	response := listRepos("JLiu1272", "github-webhook-server")
+	http.HandleFunc("/receive", slashCommandHandler)
 
-	for _, issue := range response.Repository.Issues.Nodes {
-		fmt.Println(issue.Title)
-		fmt.Println(issue.Body)
-		fmt.Println(issue.URL)
-	}
+	// log.Fatal(http.ListenAndServeTLS(":443", "server.crt", "server.key", nil))
+	fmt.Println("Server listening on port 8080...")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
+
+// func main() {
+// 	response := listRepos("JLiu1272", "github-webhook-server")
+
+// 	for _, issue := range response.Repository.Issues.Nodes {
+// 		fmt.Println(issue.Title)
+// 		fmt.Println(issue.Body)
+// 		fmt.Println(issue.URL)
+// 	}
+// }

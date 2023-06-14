@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/machinebox/graphql"
 )
@@ -50,5 +51,14 @@ func listRepos(owner string, repoName string) Repository {
 	if err := graphqlClient.Run(context.Background(), graphqlRequest, &graphqlResponse); err != nil {
 		panic(err)
 	}
+	for _, issue := range graphqlResponse.Repository.Issues.Nodes {
+		fmt.Println(issue.Title)
+		fmt.Println(issue.Body)
+		fmt.Println(issue.URL)
+	}
 	return graphqlResponse
+}
+
+func formatListReposResponse() {
+
 }
