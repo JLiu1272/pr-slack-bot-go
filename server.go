@@ -110,15 +110,29 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 	switch command {
 	case "/pr":
 		actions := strings.Fields(params.Text)
-		fmt.Println(actions[0])
-		fmt.Println(actions[1])
+
+		if len(actions) < 1 {
+			w.Write([]byte(helpMessege()))
+			return
+		}
+
+		if actions[0] == "help" {
+			w.Write([]byte(helpMessege()))
+			return
+		}
+
+		if len(actions) < 2 {
+			w.Write([]byte(helpMessege()))
+			return
+		}
 
 		if actions[0] == "list" {
-			repoName := strings.Split(actions[1], ":")
+			repoName := actions[1]
 			userName := "JLiu1272"
-			prs := listPRs(userName, repoName[1])
-			response := formatListPRsResponse(prs, repoName[1])
+			prs := listPRs(userName, repoName)
+			response := formatListPRsResponse(prs, repoName)
 			w.Write([]byte(response))
+			return
 		}
 
 	default:
