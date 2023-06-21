@@ -115,13 +115,11 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 
 		if actions[0] == "list" {
 			repoName := strings.Split(actions[1], ":")
-			repository := listRepos("JLiu1272", repoName[1])
-			response := fmt.Sprintf("%#v", repository)
+			userName := "JLiu1272"
+			prs := listPRs(userName, repoName[1])
+			response := formatListPRsResponse(prs, repoName[1])
 			w.Write([]byte(response))
 		}
-
-		// response := fmt.Sprintf("Do you want to create a PR for %v to %v?", actions[0], actions[1])
-		// w.Write([]byte(response))
 
 	default:
 		w.WriteHeader(http.StatusInternalServerError)
@@ -139,11 +137,8 @@ func main() {
 }
 
 // func main() {
-// 	response := listRepos("JLiu1272", "github-webhook-server")
+// 	repoName := "github-webhook-server"
+// 	response := repoURL("JLiu1272", repoName)
 
-// 	for _, issue := range response.Repository.Issues.Nodes {
-// 		fmt.Println(issue.Title)
-// 		fmt.Println(issue.Body)
-// 		fmt.Println(issue.URL)
-// 	}
+// 	fmt.Print(response)
 // }
