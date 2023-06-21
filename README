@@ -10,10 +10,16 @@
 ### Slash commands
 
 - `/pr help` - list all emoji meanings and commands;
-- `/pr list <repo>` - list all open prs for a given repo on the channel;
-- `/pr list mine` - list all of your PRs on the channel;
-- `/pr list @user` - list all PRs on the channel from a specific user;
-- `/pr list @userGroup` - list all PRs on the channel from a specific user group;
+
+![pr help command](docs/pr_help.png)
+
+- `/pr list <repo>` - list top 5 most recent PRs from the slack username. Assuming that the slack username matches github username;
+
+![pr list repo](docs/pr_list.png)
+
+- `/pr list <repo> <username>` - list top 5 most recent PRs from the provided github username;
+
+![pr help command](docs/pr_list.png)
 
 ### Resources
 
