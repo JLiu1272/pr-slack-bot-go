@@ -28,7 +28,7 @@ type Node struct {
 	CreatedAt string `json:"createdAt"`
 }
 
-func listPRs(owner string, repoName string) Repository {
+func listPRs(owner string, repoName string) (Repository, error) {
 	graphqlClient := graphql.NewClient("https://api.github.com/graphql")
 	graphqlRequest := graphql.NewRequest(
 		`
@@ -55,15 +55,9 @@ func listPRs(owner string, repoName string) Repository {
 	var graphqlResponse Repository
 
 	if err := graphqlClient.Run(context.Background(), graphqlRequest, &graphqlResponse); err != nil {
-		panic(err)
+		return graphqlResponse, err
 	}
-	for _, pr := range graphqlResponse.Repository.PullRequests.Nodes {
-		fmt.Println(pr.Title)
-		fmt.Println(pr.Author.Login)
-		fmt.Println(pr.URL)
-		fmt.Println(pr.CreatedAt)
-	}
-	return graphqlResponse
+	return graphqlResponse, nil
 }
 
 func formatListPRsResponse(repoInfo Repository, repoName string) string {

@@ -128,9 +128,15 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 
 		if actions[0] == "list" {
 			repoName := actions[1]
-			userName := "JLiu1272"
-			prs := listPRs(userName, repoName)
-			response := formatListPRsResponse(prs, repoName)
+			response := ""
+
+			if len(actions) == 3 {
+				username := actions[2]
+				response = listAction(repoName, username)
+			} else {
+				response = listAction(repoName, s.UserName)
+			}
+
 			w.Write([]byte(response))
 			return
 		}
@@ -151,8 +157,6 @@ func main() {
 }
 
 // func main() {
-// 	repoName := "github-webhook-server"
-// 	response := repoURL("JLiu1272", repoName)
-
-// 	fmt.Print(response)
+// 	fmt.Printf("Username: %v\n", usernameExist("saurabh0719"))
+// 	fmt.Printf("List Actions: %v\n", listAction("github-webhook-server", "saurabh0719"))
 // }
