@@ -5,6 +5,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -112,7 +113,14 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 		actions := strings.Fields(params.Text)
 
 		if len(actions) < 1 {
-			w.Write([]byte(helpMessege()))
+			w.Header().Set("Content-Type", "application/json")
+			err := json.NewEncoder(w).Encode(build_block())
+			if err != nil {
+				// Handle error
+				http.Error(w, "Failed to encode JSON", http.StatusInternalServerError)
+				return
+			}
+			// w.Write([]byte(helpMessege()))
 			return
 		}
 
@@ -157,6 +165,5 @@ func main() {
 }
 
 // func main() {
-// 	fmt.Printf("Username: %v\n", usernameExist("saurabh0719"))
-// 	fmt.Printf("List Actions: %v\n", listAction("github-webhook-server", "saurabh0719"))
+// 	build_block()
 // }
