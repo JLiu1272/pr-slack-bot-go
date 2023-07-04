@@ -79,6 +79,19 @@ func VerifySlackRequest(r *http.Request, baseStr string, signingSecret string) (
 	return hmac.Equal([]byte(signature), []byte(expectedSignature)), nil
 }
 
+func sendResponseToChannel(w http.ResponseWriter, r *http.Request) {
+
+	// Unmarshal the request body
+	var reqBody slack.InteractionCallback
+	json.Unmarshal([]byte(r.FormValue("payload")), &reqBody)
+
+	// print the unmarsheled request body
+	// print the unmarsheled request body with formatting. Where the key is indented and the value is on the same line
+	fmt.Printf("Request Body: %+v\n\n", reqBody)
+
+	w.Write([]byte(helpMessege()))
+}
+
 func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 	s, err := slack.SlashCommandParse(r)
 	if err != nil {
@@ -89,38 +102,12 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 	command := s.Command
 	params := &slack.Msg{Text: s.Text}
 
-	slack_signature := r.Header.Get("X-Slack-Signature")
-	baseStr := fmt.Sprintf("v0:%v:%v",
-		r.Header.Get("X-Slack-Request-Timestamp"),
-		formatSlashCommand(s),
-	)
-
-	fmt.Printf("X-Slack-Signature: %v\n\n", slack_signature)
-	fmt.Printf("baseStr: %v\n\n", baseStr)
-
-	isVerified, err := VerifySlackRequest(r, baseStr, getENVVar("SLACK_TOKEN"))
-
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Println("It can here")
-		return
-	}
-
-	fmt.Printf("slack request is valid:%v", isVerified)
-
 	switch command {
 	case "/pr":
 		actions := strings.Fields(params.Text)
 
 		if len(actions) < 1 {
-			w.Header().Set("Content-Type", "application/json")
-			err := json.NewEncoder(w).Encode(build_block())
-			if err != nil {
-				// Handle error
-				http.Error(w, "Failed to encode JSON", http.StatusInternalServerError)
-				return
-			}
-			// w.Write([]byte(helpMessege()))
+			w.Write([]byte(helpMessege()))
 			return
 		}
 
@@ -136,7 +123,7 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 
 		if actions[0] == "list" {
 			repoName := actions[1]
-			response := ""
+			response := interface{}(nil)
 
 			if len(actions) == 3 {
 				username := actions[2]
@@ -145,7 +132,13 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 				response = listAction(repoName, s.UserName)
 			}
 
-			w.Write([]byte(response))
+			w.Header().Set("Content-Type", "application/json")
+			err := json.NewEncoder(w).Encode(response)
+			if err != nil {
+				// Handle error
+				http.Error(w, "Failed to encode JSON", http.StatusInternalServerError)
+				return
+			}
 			return
 		}
 
@@ -158,6 +151,7 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/receive", slashCommandHandler)
+	http.HandleFunc("/send", sendResponseToChannel)
 
 	// log.Fatal(http.ListenAndServeTLS(":443", "server.crt", "server.key", nil))
 	fmt.Println("Server listening on port 8080...")
@@ -165,5 +159,14 @@ func main() {
 }
 
 // func main() {
-// 	build_block()
+// 	block := build_block("JLiu1272", "github-webhook-server")
+
+// 	jsonBytes, err := json.MarshalIndent(block, "", " ")
+// 	if err != nil {
+// 		fmt.Println("Error marshaling JSON:", err)
+// 		return
+// 	}
+
+// 	jsonString := string(jsonBytes)
+// 	fmt.Println(jsonString)
 // }

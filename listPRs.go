@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/machinebox/graphql"
 )
@@ -58,15 +57,4 @@ func listPRs(owner string, repoName string) (Repository, error) {
 		return graphqlResponse, err
 	}
 	return graphqlResponse, nil
-}
-
-func formatListPRsResponse(repoInfo Repository, repoName string) string {
-	repoURL := repoURL("JLiu1272", repoName)
-	response := fmt.Sprintf("Here are the top 5 most recent PRs for <%v|%v>:\n", repoURL, repoName)
-
-	for index, pr := range repoInfo.Repository.PullRequests.Nodes {
-		response += fmt.Sprintf("  %v. <%v|%v>\n", index+1, pr.URL, pr.Title)
-	}
-
-	return response
 }
