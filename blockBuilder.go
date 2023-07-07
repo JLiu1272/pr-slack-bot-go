@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 type Block struct {
 	Type     string     `json:"type"`
 	Text     *TextBlock `json:"text,omitempty"`
@@ -58,14 +56,14 @@ func richTextSection(repoInfo Repository, repoName string) []Element {
 func selectOptions(repoInfo Repository, repoName string) []Option {
 	select_options := []Option{}
 
-	for index, pr := range repoInfo.Repository.PullRequests.Nodes {
+	for _, pr := range repoInfo.Repository.PullRequests.Nodes {
 		select_options = append(select_options, Option{
 			Text: &TextBlock{
 				Type:  "plain_text",
 				Text:  pr.Title,
 				Emoji: true,
 			},
-			Value: fmt.Sprintf("value-%d", index),
+			Value: pr.URL,
 		})
 	}
 

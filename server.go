@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -14,8 +15,26 @@ import (
 	"strings"
 
 	"github.com/joho/godotenv"
-	"github.com/nlopes/slack"
+	"github.com/slack-go/slack"
 )
+
+type BlockActionsEvent struct {
+	Actions []ActionBlock `json:"actions"`
+}
+
+type ActionBlock struct {
+	Type           string         `json:"type"`
+	ActionID       string         `json:"action_id"`
+	BlockID        string         `json:"block_id"`
+	SelectedOption SelectedOption `json:"selected_option"`
+	Placeholder    TextBlock      `json:"placeholder"`
+	ActionTS       string         `json:"action_ts"`
+}
+
+type SelectedOption struct {
+	Text  TextBlock `json:"text"`
+	Value string    `json:"value"`
+}
 
 func getENVVar(key string) string {
 	err := godotenv.Load(".env")
@@ -80,16 +99,34 @@ func VerifySlackRequest(r *http.Request, baseStr string, signingSecret string) (
 }
 
 func sendResponseToChannel(w http.ResponseWriter, r *http.Request) {
+	buf, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("[ERROR] Failed to read request body: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
-	// Unmarshal the request body
-	var reqBody slack.InteractionCallback
-	json.Unmarshal([]byte(r.FormValue("payload")), &reqBody)
+	jsonStr, err := url.QueryUnescape(string(buf)[8:])
+	if err != nil {
+		log.Printf("[ERROR] Failed to unespace request body: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
-	// print the unmarsheled request body
-	// print the unmarsheled request body with formatting. Where the key is indented and the value is on the same line
-	fmt.Printf("Request Body: %+v\n\n", reqBody)
+	var message BlockActionsEvent
 
-	w.Write([]byte(helpMessege()))
+	if err := json.Unmarshal([]byte(jsonStr), &message); err != nil {
+		log.Printf("[ERROR] Failed to decode json message from slack: %s", jsonStr)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	prTitle := message.Actions[0].SelectedOption.Text.Text
+	prURL := message.Actions[0].SelectedOption.Value
+
+	codeReviewRequestMsg := fmt.Sprintf("Can I get a code review request for PR: <%v|%v>", prTitle, prURL)
+
+	w.Write([]byte(codeReviewRequestMsg))
 }
 
 func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
@@ -157,16 +194,3 @@ func main() {
 	fmt.Println("Server listening on port 8080...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
-
-// func main() {
-// 	block := build_block("JLiu1272", "github-webhook-server")
-
-// 	jsonBytes, err := json.MarshalIndent(block, "", " ")
-// 	if err != nil {
-// 		fmt.Println("Error marshaling JSON:", err)
-// 		return
-// 	}
-
-// 	jsonString := string(jsonBytes)
-// 	fmt.Println(jsonString)
-// }
