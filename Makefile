@@ -7,6 +7,12 @@ build:
 	@echo "Building binary..."
 	@go build -o $(BINARY_NAME) -v
 
+# Run playground 
+# Usage: make playground
+mini-playground:
+	@echo "Running playground..."
+	@go run ./playground/main.go
+
 # Using a crude way to start a server. This is not a recommended approach 
 # Usage: make start 
 start:

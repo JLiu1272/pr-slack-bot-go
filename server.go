@@ -98,7 +98,21 @@ func VerifySlackRequest(r *http.Request, baseStr string, signingSecret string) (
 	return hmac.Equal([]byte(signature), []byte(expectedSignature)), nil
 }
 
-func sendResponseToChannel(w http.ResponseWriter, r *http.Request) {
+func sendMessageToChannel(message string) (channelID string, timestamp string, err error) {
+	api := slack.New(getENVVar("SLACK_BOT_TOKEN"))
+
+	channelID, timestamp, err = api.PostMessage(
+		getENVVar("CHANNEL_ID"),
+		slack.MsgOptionText(message, false),
+	)
+
+	if err != nil {
+		return channelID, timestamp, err
+	}
+	return channelID, timestamp, nil
+}
+
+func receiveSelectedOption(w http.ResponseWriter, r *http.Request) {
 	buf, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Printf("[ERROR] Failed to read request body: %s", err)
@@ -124,9 +138,15 @@ func sendResponseToChannel(w http.ResponseWriter, r *http.Request) {
 	prTitle := message.Actions[0].SelectedOption.Text.Text
 	prURL := message.Actions[0].SelectedOption.Value
 
-	codeReviewRequestMsg := fmt.Sprintf("Can I get a code review request for PR: <%v|%v>", prTitle, prURL)
+	requestCodeReviewMsg := fmt.Sprintf("Can I get a code review request for PR: <%v|%v>", prTitle, prURL)
 
-	w.Write([]byte(codeReviewRequestMsg))
+	if channelID, timestamp, err := sendMessageToChannel(requestCodeReviewMsg); err != nil {
+		log.Printf("[ERROR] Failed to send message to channel: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	} else {
+		w.Write([]byte(fmt.Sprintf("Message successfully sent to channel %s at %s", channelID, timestamp)))
+	}
 }
 
 func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
@@ -188,7 +208,7 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/receive", slashCommandHandler)
-	http.HandleFunc("/send", sendResponseToChannel)
+	http.HandleFunc("/send", receiveSelectedOption)
 
 	// log.Fatal(http.ListenAndServeTLS(":443", "server.crt", "server.key", nil))
 	fmt.Println("Server listening on port 8080...")
