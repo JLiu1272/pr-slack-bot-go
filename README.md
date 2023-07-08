@@ -2,8 +2,7 @@
 
 A Slack App that lists the top N most recent PRs and gives you the ability to ask for a code review faster.
 
-
-
+https://github.com/JLiu1272/pr-slack-bot-go/assets/9962527/5bb1ca9f-7df7-4f2e-a32c-2594abcab1d3
 
 ## Slash commands
 
