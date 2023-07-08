@@ -7,6 +7,13 @@ build:
 	@echo "Building binary..."
 	@go build -o $(BINARY_NAME) -v
 
+# Run playground. A fast way to experiment 
+# Usage: make mini-playground
+mini-playground:
+	@echo "Running playground..."
+	@go run ./playground/main.go
+
+# Usage: make start 
 start:
 	@echo "Starting server..."
-	@go run *.go 
+	@go run ./actions.go ./blockBuilder.go ./helpMessage.go ./listPRs.go ./server.go ./usernameExist.go 

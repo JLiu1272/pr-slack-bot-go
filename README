@@ -1,20 +1,24 @@
 # Pull Request Slack Bot
 
-##### TODO
+A Slack App that lists the top N most recent PRs and gives you the ability to ask for a code review faster.
 
-- [ ] Create a slackbot that can list all open prs for a repo
-- [ ] Create a slackbot that can list all of your PRs on the channel
+## Slash commands
 
-## Features
+- `/pr help` - list instructions on how to use this slash app
 
-### Slash commands
+![pr help command](docs/pr_help.png)
 
-- `/pr help` - list all emoji meanings and commands;
-- `/pr list <repo>` - list all open prs for a given repo on the channel;
-- `/pr list mine` - list all of your PRs on the channel;
-- `/pr list @user` - list all PRs on the channel from a specific user;
-- `/pr list @userGroup` - list all PRs on the channel from a specific user group;
+- `/pr list <repo>` - list top 5 most recent PRs from the slack username. Assuming that the slack username matches github username;
 
-### Resources
+If slack and github username does not match, it will show this message
 
-- [Slack API Admin Panel](https://api.slack.com/apps/A059EPB12KS)
+![pr list repo](docs/pr_list.png)
+
+- `/pr list <repo> <username>` - list top 5 most recent PRs from the provided github username;
+
+![pr help command](docs/pr_list.png)
+
+## ROADMAP
+
+- [ ] Fix slash command listing such that it only shows top 5 most recent open PRs
+- [ ] Fix Verification
