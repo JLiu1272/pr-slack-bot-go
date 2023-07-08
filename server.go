@@ -138,7 +138,7 @@ func receiveSelectedOption(w http.ResponseWriter, r *http.Request) {
 	prTitle := message.Actions[0].SelectedOption.Text.Text
 	prURL := message.Actions[0].SelectedOption.Value
 
-	requestCodeReviewMsg := fmt.Sprintf("Can I get a code review request for PR: <%v|%v>", prTitle, prURL)
+	requestCodeReviewMsg := fmt.Sprintf("Can I get a code review for <%v|%v>? Thank you!", prURL, prTitle)
 
 	w.Write([]byte("ACK Message Sent\n"))
 
