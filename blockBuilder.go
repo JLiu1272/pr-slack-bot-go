@@ -87,7 +87,7 @@ func listPRsMessage(username string, repoName string) (prsMessage interface{}) {
 				Type: "section",
 				Text: &TextBlock{
 					Type: "mrkdwn",
-					Text: "Here are the top 5 PRs:",
+					Text: "Top 5 Most Recent PRs (Sorted by Date PR was opened):",
 				},
 			},
 			{

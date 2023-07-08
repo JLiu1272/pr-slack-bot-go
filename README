@@ -4,7 +4,7 @@ A Slack App that lists the top N most recent PRs and gives you the ability to as
 
 ## Slash commands
 
-- `/pr help` - list all emoji meanings and commands;
+- `/pr help` - list instructions on how to use this slash app
 
 ![pr help command](docs/pr_help.png)
 
