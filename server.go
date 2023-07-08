@@ -140,6 +140,8 @@ func receiveSelectedOption(w http.ResponseWriter, r *http.Request) {
 
 	requestCodeReviewMsg := fmt.Sprintf("Can I get a code review request for PR: <%v|%v>", prTitle, prURL)
 
+	w.Write([]byte("ACK Message Sent\n"))
+
 	if channelID, timestamp, err := sendMessageToChannel(requestCodeReviewMsg); err != nil {
 		log.Printf("[ERROR] Failed to send message to channel: %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
