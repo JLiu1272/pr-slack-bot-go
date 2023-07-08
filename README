@@ -10,6 +10,8 @@ A Slack App that lists the top N most recent PRs and gives you the ability to as
 
 - `/pr list <repo>` - list top 5 most recent PRs from the slack username. Assuming that the slack username matches github username;
 
+If slack and github username does not match, it will show this message
+
 ![pr list repo](docs/pr_list.png)
 
 - `/pr list <repo> <username>` - list top 5 most recent PRs from the provided github username;
