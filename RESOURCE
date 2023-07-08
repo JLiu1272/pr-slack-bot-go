@@ -1,0 +1,4 @@
+### Resources
+
+- [Slack API Admin Panel](https://api.slack.com/apps/A059EPB12KS)
+- [Slack Block Kit Builder](https://app.slack.com/block-kit-builder/T0593LKD1ED#%7B%22blocks%22:%5B%7B%22type%22:%22section%22,%22text%22:%7B%22type%22:%22mrkdwn%22,%22text%22:%22New%20Paid%20Time%20Off%20request%20from%20%3Cexample.com%7CFred%20Enriquez%3E%5Cn%5Cn%3Chttps://example.com%7CView%20request%3E%22%7D%7D,%7B%22type%22:%22actions%22,%22elements%22:%5B%7B%22type%22:%22button%22,%22text%22:%7B%22type%22:%22plain_text%22,%22text%22:%22Send%20PR%20to%20Chat%22,%22emoji%22:true%7D,%22value%22:%22click_me_123%22,%22action_id%22:%22actionId-0%22%7D%5D%7D%5D%7D)
