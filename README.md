@@ -20,6 +20,14 @@ If slack and github username does not match, it will show this message
 
 ![pr help command](docs/pr_list.png)
 
+## How To Build/Run Docker Image
+
+1. Run `docker build -t docker-slack-bot .` at the root. The `docker-slack-bot` is the name of the image, which is customizable.
+2. Run `docker image ls` to check that the image built successfully.
+3. Run the docker image with this command - `docker run -d -p 8080:8080 --name slack-bot docker-slack-bot`. Again, `docker-slack-bot` is customizable. Similarly, the name of the image is also customizable.
+
+To understand more about what each flag does and its command, read [this](https://docs.docker.com/language/golang/run-containers/)
+
 ## ROADMAP
 
 - [ ] Fix slash command listing such that it only shows top 5 most recent open PRs
